@@ -1,0 +1,94 @@
+{# indice #}
+{% extends 'layout/intranet.html.twig'%}
+{% block head %}
+{{ parent() }}
+{% endblock %}
+{% block titulo 'Administradora de Condominio'%}
+{% block contenido %}
+<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
+<script type="text/javascript">
+try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+</script>
+<ul class="breadcrumb">
+<li>
+<i class="ace-icon fa fa-home home-icon"></i>
+<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
+</li>
+<li class="active">Inicio</li>
+</ul><!-- /.breadcrumb -->
+</div>
+<div class="page-content">
+<div class="page-content-area">
+<div class="page-header hidden-phone">
+<h1>Bienvenido
+<small>
+<i class="ace-icon fa fa-angle-double-right"></i>
+Cartelera
+</small>
+</h1>
+</div>
+<div class="row">
+<div class="col-xs-12">
+<!-- PAGE CONTENT BEGINS -->
+<div class="alert alert-block alert-success">
+<button class="close" data-dismiss="alert" type="button"></button>
+<i class="ace-icon fa fa-check green"></i>
+La información que encuentra en este sitio web esta actualizada el <strong>{{fecha_actualizacion}}</strong>.
+</div>
+<div class="row">
+<div class="col-sm-6">
+<div class="widget-box transparent">
+<div class="widget-header widget-header-flat">
+<h4 class="widget-title lighter">
+<i class="ace-icon fa fa-rss orange"></i>
+Cobranza Mensual</h4>
+<div class="widget-toolbar">
+<a data-action="collapse" href="#">
+<i class="ace-icon fa fa-chevron-up"></i>
+</a>
+</div>
+</div>
+<div class="widget-body">
+<div class="widget-main padding-4">
+<div id="cobranza-charts" class="demo-placeholder"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-sm-6">
+<div class="widget-box transparent">
+<div class="widget-header widget-header-flat">
+<h4 class="widget-title lighter">
+<i class="ace-icon fa fa-signal"></i>
+Facturación Mensual
+</h4>
+
+<div class="widget-toolbar">
+<a data-action="collapse" href="#">
+<i class="ace-icon fa fa-chevron-up"></i>
+</a>
+</div>
+</div>
+
+<div class="widget-body">
+<div class="widget-main padding-4">
+<div id="sales-charts" class="demo-placeholder"></div>
+</div><!-- /.widget-main -->
+</div><!-- /.widget-body -->
+</div><!-- /.widget-box -->
+</div><!-- /.col -->
+</div>
+
+<div class="space-24"></div>
+<div class="alert alert-info">
+Si tiene algún problema con nuestra página web, 
+escríbanos a <a href="#">info@tucondominiofacil.com.ve</a> y le daremos oportuna
+respuesta a su requerimiento.
+</div>
+
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

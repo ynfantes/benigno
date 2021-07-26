@@ -1,0 +1,775 @@
+{% extends 'layout/intranet.html.twig'%}
+{# JAVASCRIPT #}
+{% block head %}
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta charset="utf-8" />
+{{ parent() }}
+<link rel="stylesheet" href="{{constant("ROOT")}}css/jquery.gritter.min.css" />
+{% endblock %}
+{# TITULO #}
+{% block titulo accion|title ~ ' Pago de Codominio' %}
+{# CONTENIDO #}
+{% block contenido %}
+<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
+<script type="text/javascript">
+try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+</script>
+<ul class="breadcrumb">
+<li>
+<i class="ace-icon fa fa-home home-icon"></i>
+<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
+</li>
+<li class="active">Pago de Condominio</li>
+</ul><!-- /.breadcrumb -->
+<div id="nav-search" class="nav-search">
+<form class="form-search">
+<span class="input-icon">
+<input type="text" autocomplete="off" id="nav-search-input" class="nav-search-input" placeholder="Buscar...">
+<i class="ace-icon fa fa-search nav-search-icon"></i>
+</span>
+</form>
+</div><!-- /.nav-search -->
+</div>
+<div class="page-content">
+<div class="page-content-area">
+<div class="page-header">
+<h1>
+Reporte pago
+<small>
+<i class="ace-icon fa fa-angle-double-right"></i>
+de condominio
+</small>
+</h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+<div class="col-xs-12">
+<!-- PAGE CONTENT BEGINS -->
+<div class="alert alert-block alert-success">
+<button class="close" data-dismiss="alert" type="button"></button>
+<i class="ace-icon fa fa-check green"></i>
+La información que encuentra en este sitio web esta actualizada el <strong>{{actualizacion}}</strong>.
+</div>
+<div class="widget-box">
+<div class="widget-header">
+<h4 class="widget-title">Consulta Estado de Cuenta</h4>
+</div>
+<div class="widget-body">
+<div class="widget-main">
+<form class="form-inline" method="post" action="{{constant('URL_INTRANET')}}/caja/consultar">
+<select class="input-large width-40" name="inmueble">
+<option value="">Seleccione un inmueble</option>
+{% for inmueble in inmuebles %}
+<option value="{{inmueble.id}}" {%if inmueble.id==cuentas.codinm%}selected{%endif%}>{{inmueble.nombre_inmueble}}</option>
+{% endfor %}
+</select>
+<select class="input-larg width-40" name="apto">
+<option value="">Seleccione un propietario</option>
+{% if propietarios %}
+
+{% for propietario in propietarios %}
+<option value="{{propietario.apto}}" {% if propietario.apto == cuentas.apto %} selected="selected" {% endif %}>
+{{propietario.apto}} {{propietario.nombre}} ({{propietario.recibos}})</option>
+{% endfor %}
+{% endif %}
+</select>
+<button type="submit" class="btn btn-info btn-sm">
+Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
+</button>
+</form>
+</div>
+</div>
+</div><!-- /widget-busca -->
+{#{dump(cuentas)}#}
+{%if cuentas.recibos|length > 0%} 
+<div class="widget-box">
+<div class="widget-header widget-header-blue widget-header-flat">
+<h4 class="widget-title lighter">Asistente pago de condominio</h4>
+</div>
+<div class="widget-body">
+<div class="widget-main">
+<div id="fuelux-wizard" data-target="#step-container">
+    <ul class="wizard-steps">
+    <li data-target="#step1" class="active">
+    <span class="step">1</span>
+    <span class="title">Selección de Facturas</span>
+    </li>
+    <li data-target="#step2">
+    <span class="step">2</span>
+    <span class="title">Información del Pago</span>
+    </li>
+    <li data-target="#step3">
+    <span class="step">3</span>
+    <span class="title">Resultado</span>
+    </li>
+    </ul>
+</div>
+<hr />
+<form class="form-horizontal hide" id="validation-form" method="get">
+<div class="step-content pos-rel" id="step-container">
+    <div class="step-pane active" id="step1">
+        {% if cuentas.recibos is empty %}
+        <div class="alert alert-danger">
+        <strong><i class="ace-icon fa fa-times"></i> Atención: </strong> Estimado propietario(a) usted 
+        no tiene recibos pendiente de pago.
+        </div>
+        {% else %}
+        {% set counter = 0 %}
+        {% set moneda = cuentas.inmueble.moneda %}
+        <div class="form-group">
+        <div class="col-xs-12 col-sm-9">
+        <div class="clearfix">
+        <table  class="table table-bordered table-striped responsive-utilities">
+            <caption style="text-align: left;"><h5 class="header blue bolder smaller">{{cuentas.inmueble.nombre_inmueble}}<br> 
+                    {{cuentas.inmueble.unidad}}: {{cuentas.propiedad.apto }}<br>
+                Deuda Total:
+                {% if cuentas.propiedad.meses_pendiente > constant('MESES_COBRANZA') %}
+                ---
+                {% else %}
+                {{moneda}}
+                {{format_number(cuentas.propiedad.deuda_total)}}
+                {%if cuentas.inmueble.facturacion_usd%} o ${{cuentas.propiedad.deuda_usd}}{%endif%}
+                {% endif %}
+            </h5>
+            <p class="text-info">Marque las facturas a cancelar<p>
+            </caption>
+            <thead>
+                <tr>
+                    <th style="text-align: center">Pagar</th>
+                    <th style="text-align: center" class="hidden-phone">Nº Factura</th>
+                    <th style="text-align: center">Período</th>
+                    <th style="text-align: center" class="hidden-phone">Facturado</th>
+                    <th style="text-align: center" class="hidden-phone">Abonado</th>
+                    <th style="text-align: center">Saldo</th>
+                    {%if cuentas.inmueble.facturacion_usd %}
+                    <th style="text-align: center">Saldo USD</th>
+                    {%endif%}
+                    <th style="text-align: center">Estatus</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% set apto = '' %}
+            {% set inmueble = '' %}
+            {% set periodo = '' %}
+            {% set deuda = 0 %}
+            {% set deuda_usd = 0 %}
+            {% for factura in cuentas.recibos %}
+                {% set apto = factura.apto %}
+                {% set inmueble = factura.id_inmueble %}
+                {% set periodo = factura.periodo %}
+                {% set deuda = deuda + factura.facturado - factura.abonado %}
+                {% set deuda_usd = deuda_usd + factura.facturado_usd %}
+            <tr>
+                <td style="text-align: center">
+                <input type="checkbox" name="id[]" value="{{counter}}" {{factura.pagado > 0? "disabled=\'disabled\'":"" }}>
+                </td>
+                <td style="text-align: center" class="hidden-phone">
+                <input type="hidden" name="id_inmueble[]" value="{{inmueble}}" />
+                <input type="hidden" name="id_apto[]" value="{{apto}}" />
+                <input type="hidden" name="periodo[]" value="{{periodo}}" />
+                <input type="hidden" name="facturas[]" value="{{factura.numero_factura}}" />
+                {% if factura.aviso %}
+                <a href="{{ constant('URL_SISTEMA')}}/avisos/ver/{{factura.numero_factura}}" target="_blank">{{ factura.numero_factura}}</a>
+                {% else %}
+                <abbr title="Aviso de Cobro NO DISPONIBLE" class="initialism">{{factura.numero_factura}}</abbr>
+                {%endif %}
+                </td>
+                <td style="text-align: center">{{factura.periodo | date("m-Y") | upper}}</td>
+                <td class="hidden-phone"><span class="pull-right">{{format_number(factura.facturado)}}</span></td>
+                <td class="hidden-phone"><span class="pull-right">{{format_number(factura.abonado)}}</span></td>
+                <td>
+                    <input type="hidden" name="montos[]" value="{{factura.facturado - factura.abonado}}" />
+                    <span class="pull-right">
+                    {{ format_number(factura.facturado - factura.abonado) }}
+                    </span>
+                </td>
+                {%if cuentas.inmueble.facturacion_usd %}
+                    <td><span class="pull-right">{{format_number(factura.facturado_usd)}}</span></td>
+                {%endif%}
+                <td>
+                    {% if factura.pagado == 0 %}
+                        <span class="label label-sm label-success arrowed-in arrowed-in-right">Pendiente</span> 
+                    {% else %}
+                        <a 
+                            href='javacript:void(0)'
+                            data-html="true" 
+                            data-original-title="{{factura.pagado_detalle}}" 
+                            data-placement="top" 
+                            data-rel="tooltip" 
+                            class="label label-sm label-warning arrowed-in arrowed-in-right tooltip-warning" style="color:#333">Pendiente por procesar
+                        </a> 
+                    {% endif %}
+                </td>
+            </tr>
+            {% set counter = counter + 1 %}
+            {% endfor %}
+            {% set honorarios = cuentas.propiedad.deuda_total - deuda %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5"><span class="pull-right blue bolder smaller">Total Deuda:</span></td>
+                <td><span class="pull-right">{{format_number(deuda)}}</span></td>
+                {%if cuentas.inmueble.facturacion_usd%}
+                <td><span class="pull-right">{{format_number(deuda_usd)}}</span></td>
+                {%endif%}
+            </tr>
+            <tr>
+                <td colspan="5"><input type="hidden" name="hono_id" value="{{counter}}" />
+                    <input type="hidden" name="hono_inm" value="{{inmueble}}" />
+                    <input type="hidden" name="hono_apto" value="{{apto}}" />
+                    <input type="hidden" name="hono_periodo" value="{{periodo|date_modify("+1 month")|date("Y-m-d 00:00:00")}}" />
+                    <input type="hidden" name="hono_fact" value="HONORARIOS" />
+                    <input type="hidden" name="hono_monto" value="{{honorarios}}" />
+                    <span class="pull-right blue bolder smaller">Honorarios:</span>
+                </td>
+                <td><span class="pull-right"><input type="text" name="honorarios" value="{{format_number(honorarios)}}" style="text-align: right;" /></span></td>
+                {%if cuentas.inmueble.facturacion_usd%}
+                <td><span class="pull-right">{{format_number(cuentas.propiedad.deuda_usd - deuda_usd)}}</span></td>
+                {%endif%}
+            </tr>
+            <tr>
+                <td colspan="5"><span class="pull-right blue bolder smaller">Deuda + Honorarios:</span></td>
+                <td><span class="pull-right">{{format_number(cuentas.propiedad.deuda_total)}}</span></td>
+                {%if cuentas.inmueble.facturacion_usd%}
+                <td><span class="pull-right">{{format_number(cuentas.propiedad.deuda_usd)}}</span></td>
+                {%endif%}
+            </tr>
+            <tfoot>
+            
+        </table>
+        </div></div></div>
+        {% endif %}
+    </div>
+
+    <div class="step-pane" id="step2">
+    {% if cuenta.propiedades.meses_pendiente > constant('MESES_COBRANZA') %}
+    <div class="alert alert-error" style="font-size: 120%">Estimado propietario(a) {{session.usuario.nombre }}<br/><strong>Le agradecemos ponerse en contacto con el departamento de cobranzas</strong>.</div>
+    {% else %}
+        {{ form.input('hidden','','','estatus','P', false) }}
+        {{ form.input('hidden','','','enviado','0', false) }}
+        {{ form.input('hidden','','','telefono','', false) }}
+        <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-3 no-padding-right">Medio de Pago</label>
+        <div class="col-xs-12 col-sm-9">
+        <select name="tipo_pago" id="tipo_pago">
+        <option value="D">Depósito</option>
+        <option value="T">Transferencia</option>
+        <option value="USD">USD Efectivo</option>
+        </select>
+        </div>
+        </div>
+        <div class="form-group">
+        <label id="num_docu" for="numero_documento" class="control-label col-xs-12 col-sm-3 no-padding-right">Número de Depóisto</label>
+        <div class="col-xs-12 col-sm-9">
+        <div class="clearfix">
+        {{ form.input('text','input-medium ignore','numero_documento','numero_documento','', false) }}
+        </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <label for="numero_cuenta" class="control-label col-xs-12 col-sm-3 no-padding-right">Cuenta Destino</label>
+        <div class="col-xs-12 col-sm-9">
+        <div class="clearfix">
+        {{ form.input('text','input-large ignore','numero_cuenta','numero_cuenta',cuentas.inmueble.numero_cuenta, false) }}
+            </div></div>
+        </div>
+        <div class="form-group">
+        <label for="fecha_documento" class="control-label col-xs-12 col-sm-3 no-padding-right">Fecha Pago</label>
+        <div class="col-xs-12 col-sm-9">
+        <div class="input-group">
+        <span class="input-group-addon">
+        <i class="fa fa-calendar bigger-110"></i>
+        </span>
+        <input class="date-picker input-small ignore" id="fecha_documento" name="fecha_documento" type="text" data-date-format="dd-mm-yyyy" />
+        </div>
+            </div>
+        </div>
+        <div class="form-group">
+        <label for="banco_origen" class="control-label col-xs-12 col-sm-3 no-padding-right">Banco Origen de la Transferencia</label>
+        <div class="col-xs-12 col-sm-9"><div class="clearfix">
+        {{ form.input('text','input-large mayuscula ignore','banco_origen','banco_origen','', true) }}
+        </div></div>
+        </div>
+        <div class="form-group">
+        <label for="banco_destino" class="control-label col-xs-12 col-sm-3 no-padding-right">Banco Destino</label>
+        <div class="col-xs-12 col-sm-9"><div class="clearfix">
+        {{ form.input('text','input-large mayuscula ignore','banco_destino','banco_destino',cuentas.inmueble.banco, false) }}
+        </div></div>
+        </div>
+        <div class="form-group">
+        <label for="monto" class="control-label col-xs-12 col-sm-3 no-padding-right">Monto</label>
+        <div class="col-xs-12 col-sm-9">
+        <div class="input-group">
+        <span class="input-group-addon">Bs.</span>
+        {{ form.input('text','input-medium input-prepend input-append ignore','monto','monto','0,00', false) }}
+        </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <label for="email" class="control-label col-xs-12 col-sm-3 no-padding-right">e-mail Contacto</label>
+        <div class="col-xs-12 col-sm-9">
+        <div class="input-group">
+        <span class="input-group-addon">@</span>
+        {{ form.input('text','email input-xlarge input-prepend input-append ignore','email','email',usuario.email,false) }}
+        </div>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+
+    <div class="step-pane" id="step3">
+            <div  id="resultado">
+                    <h3 class="header smaller lighter grey">
+                    <i class="ace-icon fa fa-spinner fa-spin orange bigger-125"></i>
+                    Estamos procesando la información......
+                    </h3>
+            </div>
+    </div>
+
+    <div class="step-pane" id="step4">
+            <div class="center">
+                    <h3 class="green">Congrats!</h3>
+                    Your product is ready to ship! Click finish to continue!
+            </div>
+    </div>
+</div>
+</form>
+<hr />
+<div class="wizard-actions">
+<button class="btn btn-prev">
+<i class="ace-icon fa fa-arrow-left"></i>
+Regresar
+</button>
+
+<button class="btn btn-success btn-next" data-last="Finalizar">
+Continuar
+<i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+</button>
+</div>
+</div><!-- /.widget-main -->
+</div><!-- /.widget-body -->
+</div>
+{%else%}
+    {%if cuentas.recibos is defined%}
+    <div class="alert alert-block alert-info">
+    <button class="close" data-dismiss="alert" type="button"></button>
+    <i class="ace-icon fa fa-info-circle"></i>
+    El propietario seleccionado no tiene recibos pendientes de pago.
+    </div>
+        {%endif%}
+{%endif%}
+<div id="modal-wizard" class="modal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header" data-target="#modal-step-contents">
+        <ul class="wizard-steps">
+                <li data-target="#modal-step1" class="active">
+                        <span class="step">1</span>
+                        <span class="title">Selección de facturas</span>
+                </li>
+
+                <li data-target="#modal-step2">
+                        <span class="step">2</span>
+                        <span class="title">Información de Pago</span>
+                </li>
+
+                <li data-target="#modal-step3">
+                        <span class="step">3</span>
+                        <span class="title">Payment Info</span>
+                </li>
+
+                <li data-target="#modal-step4">
+                        <span class="step">4</span>
+                        <span class="title">Other Info</span>
+                </li>
+        </ul>
+</div>
+
+<div class="modal-body step-content" id="modal-step-contents">
+<div class="step-pane active" id="modal-step1">
+<div class="center">
+<h4 class="blue">Step 1</h4>
+</div>
+</div>
+
+<div class="step-pane" id="modal-step2">
+<div class="center">
+<h4 class="blue">Step 2</h4>
+</div>
+</div>
+
+<div class="step-pane" id="modal-step3">
+<div class="center">
+<h4 class="blue">Step 3</h4>
+</div>
+</div>
+
+<div class="step-pane" id="modal-step4">
+<div class="center">
+<h4 class="blue">Step 4</h4>
+</div>
+</div>
+</div>
+
+<div class="modal-footer wizard-actions">
+<button class="btn btn-sm btn-prev">
+<i class="ace-icon fa fa-arrow-left"></i>
+Prev
+</button>
+<button class="btn btn-success btn-sm btn-next" data-last="Finish">
+Next
+<i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+</button>
+<button class="btn btn-danger btn-sm pull-left" data-dismiss="modal">
+<i class="ace-icon fa fa-times"></i>
+Cancel
+</button>
+</div>
+</div><!-- PAGE CONTENT ENDS -->
+</div><!-- /.col -->
+</div><!-- /.row -->
+</div><!-- /.page-content-area -->
+</div><!-- /.page-content -->
+</div><!-- /.main-content -->
+</div><!-- /.main-container -->
+
+<!-- basic scripts -->
+
+<!--[if !IE]> -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<!-- <![endif]-->
+
+<!--[if IE]>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<![endif]-->
+
+<!--[if !IE]> -->
+<script type="text/javascript">
+window.jQuery || document.write("<script src='assets/js/jquery.min.js'>"+"<"+"/script>");
+</script>
+
+<!-- <![endif]-->
+
+<!--[if IE]>
+<script type="text/javascript">
+window.jQuery || document.write("<script src='assets/js/jquery1x.min.js'>"+"<"+"/script>");
+</script>
+<![endif]-->
+<script type="text/javascript">
+if('ontouchstart' in document.documentElement) document.write("<script src='{{ constant('ROOT')}}/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+</script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<!-- page specific plugin scripts -->
+<script src="{{constant('ROOT')}}/js/comun.js"></script>
+<script src="{{constant('ROOT')}}/js/fuelux/fuelux.wizard.min.js"></script>
+<script src="{{constant('ROOT')}}/js/bootstrap-datepicker.js"></script>
+<script src="{{constant('ROOT')}}/js/jquery-validate/jquery.validate.min.js"></script>
+<script src="{{constant('ROOT')}}/js/jquery.maskedinput.min.js"></script>
+<script src="{{constant('ROOT')}}/js/select2.min.js"></script>
+<script src="{{constant('ROOT')}}/js/jquery.gritter.min.js"></script>
+<!-- ace scripts -->
+<script src="{{constant('ROOT')}}/js/ace-elements.min.js"></script>
+<script src="{{constant('ROOT')}}/js/ace.min.js"></script>
+
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+jQuery(function($) {
+    
+$('[data-rel=tooltip]').tooltip();
+$('[data-rel=popover]').popover({html:true});
+
+
+$("ul.nav-list li").eq(0).addClass("active");
+
+        $('.date-picker').datepicker({
+        autoclose: true,
+        todayHighlight: true
+})
+//show datepicker when clicking on the icon
+.next().on(ace.click_event, function(){
+        $(this).prev().focus();
+});
+
+function totalizarPago() {
+var monto = 0;
+if($("input[name|='honorarios']").length>0) {
+    var honorarios = parseFloat($("input[name|='honorarios']").val().replaceAll(".","").replace(",","."));
+    monto = honorarios;
+}
+
+$("input:checked").each(function() {
+    var  monto_factura = $("input[name|='montos[]']").eq($(this).val()).val();
+    monto = parseFloat(monto) + parseFloat(monto_factura);
+});
+if(monto>0) {
+    $("#falta-factura").addClass("hidden");
+}
+$("#monto").val(monto.formatCurrency());
+}
+$(":checkbox").click(function() {
+totalizarPago();
+});
+$("input[name|='honorarios']").on({
+"focus": function (event) {
+    $(event.target).select();
+},
+"keyup": function (event) {
+    $(event.target).val(function (index, value ) {
+        value = value===''? 0: value;
+        return value.replace(/\D/g, "")
+                    .replace(/([0-9])([0-9]{2})$/, '$1,$2')
+                    .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ".");
+    });
+    totalizarPago();
+    }
+});
+
+var num_cta = $('#numero_cuenta').val();
+
+$("#tipo_pago").change(function() {
+    
+    const banco_origen      = $('#banco_origen');
+    const label_num_docu    = $('#num_docu');
+    const numero_documento  = $('#numero_documento');
+    const numero_cuenta     = $('#numero_cuenta');
+    const tipo_pago         = $('#tipo_pago');
+    const fecha_documento   = $('#fecha_documento');
+    const val_tipo_pago     = tipo_pago.val();
+    
+    banco_origen.attr('disabled', false);
+    numero_cuenta.attr('disabled', false);
+    numero_documento.attr('disabled', false);
+    fecha_documento.attr('disabled', false);
+    numero_cuenta.val(val_tipo_pago === 'USD' ? '' : num_cta);
+    
+    switch(val_tipo_pago) {
+        
+        case 'T':
+            label_num_docu.html("Código Transferencia:");
+            break;
+        
+        case 'D':
+            banco_origen.val('');
+            label_num_docu.html("Número Depósito:");
+            banco_origen.attr('disabled', true);
+            break;
+        
+        case 'USD':
+            numero_documento.val('');
+            banco_origen.attr('disabled', true);
+            numero_cuenta.attr('disabled', true);
+            numero_documento.attr('disabled', true);
+            fecha_documento.attr('disabled', true)
+            break;
+                            
+    }
+    
+});
+
+
+$(".select2").css('width','200px').select2({allowClear:true})
+.on('change', function(){
+$(this).closest('form').validate().element($(this));
+}); 
+
+
+var $validation = false;
+$('#fuelux-wizard')
+.ace_wizard({
+//step: 2 //optional argument. wizard will jump to step "2" at first
+})
+.on('change' , function(e, info){
+    if(info.step==2 && info.direction=='previous') {
+        $validation = false;
+    }
+    if(info.step == 1 && $validation) {
+        if(!$('#validation-form').valid()) {
+            return false;
+        }
+        $('input[type=text]').removeClass("ignore");
+    }
+    if(info.step == 3 && info.direction == 'previous') {
+        $("div#resultado").removeClass();
+        $("div#resultado").html('<h3 class="header smaller lighter grey"><i class="ace-icon fa fa-spinner fa-spin orange bigger-125"></i>Estamos procesando la información......</h3>');
+    }
+    if(info.step == 2 && info.direction == 'next') {
+        if(!$('#validation-form').valid()) {
+            return false;
+        } else {
+            $.post("{{ constant('URL_SISTEMA')}}/pago/guardar", $('#validation-form').serialize(), function(data) {
+            var obj = jQuery.parseJSON(data);
+                $("div#resultado").addClass(obj.suceed? "alert alert-success":"alert alert-danger")
+                $("div#resultado").html(obj.mensaje);
+                $(".wizard-actions").find(".btn-prev").attr("disabled","disabled");
+            });
+        }
+    }
+})
+.on('finished', function(e) {
+    window.location = '{{constant('URL_INTRANET')}}/caja/';
+/*$('ul.wizard-steps li').eq(2).addClass("complete");
+$('button[class*=btn-]').attr("disabled","disabled");
+$('div#resultado').removeClass();
+$('div#resultado').addClass("center");
+$('div#resultado').html('<div class="center"><h3 class="green">Gracias por usar nuestros servicios!</h3>{{constant('NOMBRE_APLICACION')}}</div>');*/
+}).on('stepclick', function(e) {
+//e.preventDefault();//this will prevent clicking and selecting steps
+});
+
+
+//jump to a step
+$('#step-jump').on('click', function() {
+var wizard = $('#fuelux-wizard').data('wizard')
+wizard.currentStep = 3;
+wizard.setState();
+})
+//determine selected step
+//wizard.selectedItem().step
+
+
+
+//hide or show the other form which requires validation
+//this is for demo only, you usullay want just one form in your application
+$validation = true;
+$('#validation-form').removeClass('hide');
+
+$('button[class*=btn-next]').attr("disabled","disabled");
+$("input:checkbox").each(function() {
+    if(!$(this).attr('disabled')) {
+        $('button.btn-next').removeAttr("disabled");
+        return false;
+    }
+});
+
+$.mask.definitions['~']='[+-]';
+$('#phone').mask('(999) 999-9999');
+
+jQuery.validator.addMethod("phone", function (value, element) {
+return this.optional(element) || /^\(\d{3}\) \d{3}\-\d{4}( x\d{1,6})?$/.test(value);
+}, "Ingrese un número telefónico válido.");
+
+function necesitaDetallePago() {
+    
+    return $("#tipo_pago").val() == 'T' || $("#tipo_pago").val() == 'D'
+}
+
+$('#validation-form').validate({
+errorElement: 'div',
+errorClass: 'help-block',
+focusInvalid: false,
+ignore: ".ignore",
+rules: {
+    'id[]': {
+    required: true
+    },
+    email: {
+    required: true,
+    email:true
+    },
+    numero_documento: {
+    required: function() { return necesitaDetallePago();},
+    digits: function() { return necesitaDetallePago();}
+    },
+    numero_cuenta: { 
+        required: function() { return necesitaDetallePago(); }
+    },
+    fecha_documento: { 
+        required: function() { return necesitaDetallePago(); }
+    },
+    banco_destino: { 
+        required: function() { return necesitaDetallePago(); }
+    },
+    monto: {
+    required:true,
+    number:true,
+    min: 1
+    }
+},
+messages: {
+    email: {
+    required: "Ingrese su dirección de correo electrónico.",
+    email: "Ingrese un email válido."
+    },
+    monto : {
+    required: "Debe ingresar el monto",
+    number: "Debe introducir una cantidad válida",
+    min: "El monto debe ser mayor que 1"
+    },
+    numero_documento : {
+        required: "Ingrese un número de referencia",
+        digits: "Ingrese solo números"
+    },
+    numero_cuenta: "Ingrese el número de cuenta",
+    fecha_documento: "Ingrese la fecha del depósito/transferencia",
+    banco_destino: "Ingrese el nombre del banco donde hizo el " + $('tipo_documento').val() + ".",
+    "id[]": "Debe seleccionar por lo menos una factura para continuar"
+},
+
+
+highlight: function (e) {
+$(e).closest('.form-group').removeClass('has-info').addClass('has-error');
+},
+
+success: function (e) {
+$(e).closest('.form-group').removeClass('has-error');//.addClass('has-info');
+$(e).remove();
+},
+
+errorPlacement: function (error, element) {
+if(element.is('input[type=checkbox]') || element.is('input[type=radio]')) {
+    //$('div[class*="form-group has-error"]').html(error);
+    var controls = element.closest('div[class*="col-"]');
+    controls.append(error);
+}
+else if(element.is('.select2')) {
+error.insertAfter(element.siblings('[class*="select2-container"]:eq(0)'));
+}
+else if(element.is('.chosen-select')) {
+error.insertAfter(element.siblings('[class*="chosen-container"]:eq(0)'));
+}
+else error.insertAfter(element.parent());
+},
+
+submitHandler: function (form) {
+},
+invalidHandler: function (form) {
+}
+});
+
+$('#modal-wizard .modal-header').ace_wizard();
+$('#modal-wizard .wizard-actions .btn[data-dismiss=modal]').removeAttr('disabled');
+
+$("select[name|='inmueble']").change(function() {
+var inm = $(this).val();
+if(inm!="") {
+   var datos = { id_inmueble : $(this).val() };
+   $.post("{{constant('URL_INTRANET')}}/caja/listarPropietariosPorInmueble", datos, function(propietarios) {
+
+        $("select[name|='apto']").empty();
+        $("select[name|='apto']").append('<option value="">Seleccione un propietario</option>');
+        $.each(propietarios, function(index, propietario) {
+            $("select[name|='apto']").append(
+                    "<option value=\"" + propietario.apto + 
+                    "\">" + propietario.apto + 
+                    ' ' + propietario.nombre + ' (' + propietario.recibos + ")</option>");
+        });
+    }, 'json');
+} else {
+   $("select[name|='apto']").empty();
+   $("select[name|='apto']").append('<option value="">Seleccione unidad familiar</option>');
+}
+});
+/**
+$('#date').datepicker({autoclose:true}).on('changeDate', function(ev) {
+$(this).closest('form').validate().element($(this));
+});
+
+$('#mychosen').chosen().on('change', function(ev) {
+$(this).closest('form').validate().element($(this));
+});
+*/
+})
+</script>
+{% endblock %}
