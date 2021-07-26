@@ -12,9 +12,9 @@ $mostrar_error = true;
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Cheqeuo servidor">
 if ($_SERVER['SERVER_NAME'] == "www.tucondominiofacil.com.ve" | $_SERVER['SERVER_NAME'] == "tucondominiofacil.com.ve") {
-    $user = "";
-    $password = "";
-    $db = "";
+    $user = "tucondom_root";
+    $password = "valoriza25231";
+    $db = "tucondom_valoriza2";
     //$db = "octagon";
     $email_error = true;
     $mostrar_error = false;
