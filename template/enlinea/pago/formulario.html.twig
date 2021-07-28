@@ -141,7 +141,14 @@ de condominio
                     {% if factura.pagado == 0 %} 
                         <span class="label label-sm label-success arrowed-in arrowed-in-right">Pendiente</span> 
                     {% else %}
-                        <span class="label label-sm label-warning">Pendiente por procesar</span>
+                        <a 
+                            href='javacript:void(0)'
+                            data-html="true" 
+                            data-original-title="{{factura.pagado_detalle}}" 
+                            data-placement="top" 
+                            data-rel="tooltip" 
+                            class="label label-sm label-warning arrowed-in arrowed-in-right tooltip-warning" style="color:#333">Pendiente por procesar
+                        </a>
                     {% endif %}
                 </td>
                 
@@ -391,6 +398,8 @@ if('ontouchstart' in document.documentElement) document.write("<script src='{{ c
 <!-- inline scripts related to this page -->
 <script type="text/javascript">
 jQuery(function($) {
+$('[data-rel=tooltip]').tooltip();
+$('[data-rel=popover]').popover({html:true});
 $("ul.nav-list li").eq(6).addClass("active");
 $('.date-picker').datepicker({
         autoclose: true,

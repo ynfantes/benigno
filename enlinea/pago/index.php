@@ -124,7 +124,28 @@ switch ($accion) {
                         for ($index = 0; $index < count($factura['data']); $index++) {
                             $filename = "../avisos/" . $factura['data'][$index]['numero_factura'] . ".pdf";
                             $factura['data'][$index]['aviso'] = file_exists($filename);
-                            $factura['data'][$index]['pagado'] = pago::facturaPendientePorProcesar($factura['data'][$index]['periodo'], $factura['data'][$index]['id_inmueble'], $factura['data'][$index]['apto']);
+                            
+                            $r = pago::facturaPendientePorProcesar(
+                                $factura['data'][$index]['periodo'], 
+                                $factura['data'][$index]['id_inmueble'], 
+                                $factura['data'][$index]['apto']
+                            );
+                            if ($r['suceed'] && count($r['data'])>0) {
+                        
+                                $factura['data'][$index]['pagado'] = 1;
+                                $factura['data'][$index]['pagado_detalle'] = "<i class='fa fa-calendar-o'></i> ".
+                                        Misc::date_format($r['data'][0]['fecha']).
+                                        "<br>".strtoupper($r['data'][0]['tipo_pago']);
+                                
+                                if (!$r['data'][0]['numero_documento']==='') {
+                                    $factura['data'][$index]['pagado_detalle'].=" - Ref: ".$r['data'][0]['numero_documento'];
+                                }
+                                $factura['data'][$index]['pagado_detalle'].="<br>Monto: ".number_format($r['data'][0]['monto'],2,",",".");
+                            } else {
+                                $factura['data'][$index]['pagado'] = 0;
+                                $factura['data'][$index]['pagado_detalle']='';
+                            }
+                            // $factura['data'][$index]['pagado'] = pago::facturaPendientePorProcesar($factura['data'][$index]['periodo'], $factura['data'][$index]['id_inmueble'], $factura['data'][$index]['apto']);
 
                         }
                     }

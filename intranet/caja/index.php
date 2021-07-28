@@ -52,6 +52,7 @@ switch ($accion) {
                            );
                     
                     if ($r['suceed'] && count($r['data'])>0) {
+                        
                         $factura['data'][$index]['pagado'] = 1;
                         $factura['data'][$index]['pagado_detalle'] = "<i class='fa fa-calendar-o'></i> ".
                                 Misc::date_format($r['data'][0]['fecha']).
