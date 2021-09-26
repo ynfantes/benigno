@@ -65,7 +65,36 @@ window.jQuery || document.write("<script src='assets/js/jquery1x.min.js'>"+"<"+"
 <![endif]-->
 
 <link rel="shortcut icon" href="{{constant("ROOT")}}images/favicon.png">
-
+<style type="text/css">
+.is-required:after {
+  content: '*';
+  margin-left: 3px;
+  color: red;
+  font-weight: bold;
+}
+span.error {
+    color: red;
+}
+.placeholder {
+    position: absolute;
+    top: 520px;
+    left: 95px;
+    font-size: 34px;
+    color: #e4e5e7;
+    display: none;
+    pointer-events: none;
+}
+.placeholder:before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 40px;
+    background-color: #53c3e8;
+    position: absolute;
+    left: -14px;
+    top: 3px;
+}
+</style>
 {% endblock %}
 <title>{% block titulo %}{% endblock %} - {{constant('TITULO')}}</title>
 
@@ -110,6 +139,7 @@ try{ace.settings.check('main-container' , 'fixed')}catch(e){}
 <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 </a>
 </div> 
+{% block js %}
 <!-- Le javascript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
@@ -130,6 +160,7 @@ if('ontouchstart' in document.documentElement) document.write("<script src='asse
 <!-- ace scripts -->
 <script src="{{constant("ROOT")}}/js/ace-elements.min.js"></script>
 <script src="{{constant("ROOT")}}/js/ace.min.js"></script>
+{% endblock %}
 </body>
 </html>
 

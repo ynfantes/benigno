@@ -1,0 +1,98 @@
+{% extends 'layout/intranet.html.twig'%}
+{% block head %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta charset="utf-8"/>
+	{{ parent() }}
+	<link rel="stylesheet" href="{{constant("ROOT")}}css/jquery.gritter.min.css"/>
+{% endblock %}
+{# TITULO #}
+{% block titulo accion|title %}
+{% block contenido %}
+
+<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
+<script type="text/javascript">
+try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+</script>
+<ul class="breadcrumb">
+<li>
+<i class="ace-icon fa fa-home home-icon"></i>
+<a href="{{constant('ROOT')}}intranet.php">Intranet</a>
+</li>
+<li class="active">Publicaciones en Cartelera</li>
+</ul><!-- /.breadcrumb -->
+<div id="nav-search" class="nav-search">
+<form class="form-search">
+<span class="input-icon">
+<input type="text" autocomplete="off" id="nav-search-input" class="nav-search-input" placeholder="Buscar ...">
+<i class="ace-icon fa fa-search nav-search-icon"></i>
+</span>
+</form>
+</div><!-- /.nav-search -->
+</div>
+<div class="page-content">
+
+<div class="page-header">
+<h1>
+Publicaciones en Cartelera
+</h1>
+</div>
+
+<div class="row">
+<div class="col-xs-12">
+<!-- RESULTADO -->
+{% if resultado is defined %}
+{% include 'misc/resultado.html.twig' %}
+{% endif %}
+<!-- PAGE CONTENT BEGINS -->
+<table  class="table table-bordered table-striped">
+<!--caption style="text-align: left;"><h4>{#{ cuenta.inmueble.nombre_inmueble }#}</h4></caption-->
+<thead>
+<tr>
+{% if tabla == 'cartelera_inmueble' %}
+<th style='text-align:center'>Inmueble</th>
+{% endif %}
+<th style="text-align:center">Titulo</th>
+<th style="text-align:center">Contenido</th>
+<th style="text-align:center">Fecha de Publicación</th>
+<th style="text-align:center">Acción</th>
+</tr>
+</thead>
+<tbody>
+{% if publicaciones %}
+
+    {% for publicacion in publicaciones %}
+
+        <tr>
+        {% if tabla == 'cartelera_inmueble' %}
+        <td style='text-align:center'>{{publicacion.inmueble}}</td>
+        {% endif %}
+        <td>{{publicacion.titulo}}</td>
+        <td>{{publicacion.contenido|raw}}</td>
+        <td>{{publicacion.fecha|date("d/m/Y")}}</td>
+        <td style="text-align:center"><a href="{{constant('URL_INTRANET')}}/cartelera/?accion=eliminar&tabla={{tabla}}&id={{publicacion.id}}"><i class="ace-icon fa fa-trash-o bigger-130"></i></a></td>
+        </tr>
+        
+    {% endfor %}
+
+{% else %}
+
+    <tr><td colspan="4">No existen publicaciones registradas</td></tr>
+
+{% endif %}
+</tbody>
+</table>
+</div><!-- /.col -->
+</div>
+</div>
+
+{% endblock %}
+{% block js %}
+{{ parent()}}
+<script type="text/javascript">
+$("ul.nav-list li").eq(2).addClass("active");
+    $('.date-picker').datepicker({
+    autoclose: true,
+    todayHighlight: true
+})
+</script>
+{% endblock %}

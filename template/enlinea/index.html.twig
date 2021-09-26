@@ -13,7 +13,7 @@ google.setOnLoadCallback(drawChart);
 
 function drawChart() {
 var data_facturacion = $.ajax({
-url: "{{ constant("URL_SISTEMA")}}/inmueble/facturacion",
+url: "{{constant("URL_SISTEMA")}}/inmueble/facturacion",
 dataType:"json",
 async: false
 }).responseText;
@@ -65,7 +65,7 @@ try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
 <ul class="breadcrumb">
 <li>
 <i class="ace-icon fa fa-home home-icon"></i>
-<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
+<a href="{{constant('URL_SISTEMA')}}">{{constant("NOMBRE_APLICACION")}}</a>
 </li>
 <li class="active">Inicio</li>
 </ul><!-- /.breadcrumb -->
@@ -86,7 +86,7 @@ Cartelera
 <div class="alert alert-block alert-success">
 <button class="close" data-dismiss="alert" type="button"></button>
 <i class="ace-icon fa fa-check green"></i>
-La información que encuentra en este sitio web esta actualizada el <strong>{{ fecha_actualizacion }}</strong>.
+La información que encuentra en este sitio web esta actualizada el <strong>{{fecha_actualizacion}}</strong>.
 </div>
 <div class="row">
 <div class="col-sm-6">
@@ -133,11 +133,59 @@ Facturación Mensual
 </div><!-- /.col -->
 </div>
 
+{% if cartelera_inmueble %}
+
+<div class="timeline-container">
+<div class="timeline-label">
+<span class="label label-primary arrowed-in-right label-lg">
+    <b>Cartelera Condominio</b>
+</span>
+</div>
+<!-- timeline-items -->
+<div class="timeline-items">
+{% for publicacion in cartelera_inmueble %}
+{% for post in publicacion %}
+    <!-- timeline-item -->
+    <div class="timeline-item clearfix">
+        <div class="widget-box transparent">
+            <div class="widget-header widget-header-small">
+                <h5 class="widget-title smaller">
+                    <strong>{{post.titulo}}</strong>
+                </h5>
+
+                <span class="widget-toolbar no-border">
+                    <i class="ace-icon fa fa-calendar-o bigger-110"></i>
+                    {{post.fecha|date("d/m/Y")}}
+                </span>
+                <span class="widget-toolbar">
+                    <a href="#" data-action="collapse">
+                        <i class="ace-icon fa fa-chevron-down"></i>
+                    </a>
+                </span>
+
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    {{post.contenido|raw}}
+                    <div class="space-6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.timeline-item -->
+{% endfor %}
+{% endfor %}
+</div>
+<!-- /.timeline-items -->
+</div>
+{% endif %}
+
 <div class="space-24"></div>
 <div class="alert alert-info">
 Si tiene algún problema con nuestra página web, 
 escríbanos a <a href="#">info@tucondominiofacil.com.ve</a> y le daremos oportuna
-respuesta a su requerimiento.
+respuesta a su requerimiento
 </div>
 
 </div>

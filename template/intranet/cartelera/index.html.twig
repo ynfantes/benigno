@@ -1,0 +1,296 @@
+{% extends 'layout/intranet.html.twig'%}
+{# JAVASCRIPT #}
+{% block head %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta charset="utf-8"/>
+	{{ parent() }}
+	<link rel="stylesheet" href="{{constant("ROOT")}}css/jquery.gritter.min.css"/>
+{% endblock %}
+{# TITULO #}
+{% block titulo accion|title ~ ' Cartelera de Codominio' %}
+{% block contenido %}
+	<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
+		<script type="text/javascript">
+			try {
+ace.settings.check('breadcrumbs', 'fixed')
+} catch (e) {}
+		</script>
+		<ul class="breadcrumb">
+			<li>
+				<i class="ace-icon fa fa-home home-icon"></i>
+				<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
+			</li>
+			<li class="active">Cartelera Inmueble</li>
+		</ul>
+		<!-- /.breadcrumb -->
+		<div id="nav-search" class="nav-search">
+			<form class="form-search">
+				<span class="input-icon">
+					<input type="text" autocomplete="off" id="nav-search-input" class="nav-search-input" placeholder="Buscar...">
+					<i class="ace-icon fa fa-search nav-search-icon"></i>
+				</span>
+			</form>
+		</div>
+		<!-- /.nav-search -->
+	</div>
+	<div class="page-content">
+		<div class="page-content-area">
+			<div class="page-header">
+				<h1>
+					Cartelera
+					<small>
+						<i class="ace-icon fa fa-angle-double-right"></i>
+						del condominio
+					</small>
+				</h1>
+			</div>
+			<!-- /.page-header -->
+
+			<div class="cols-xs-12">
+
+				<div class="alert alert-danger" id="fallo" style="display:none">
+					<strong>
+						<i class="ace-icon fa fa-check"></i>
+						Muy bien!
+					</strong>
+					La publicación ha sido guardada con éxito. Estará disponible solo para los propietarios del inmueble seleccionado.
+				</div>
+				<div class="alert alert-success" id="exito" style="display:none">
+					<strong>
+						<i class="ace-icon fa fa-times"></i>
+						Oops!
+					</strong>
+					No se puedo guardar la publicación. Inténtelo nuevamente. Si el problema persiste póngase en contacto con el equipo de soporte.
+				</div>
+
+				<form id="publicacion" class="form-horizontal " method="post" role="form">
+					<input type="hidden" name="tabla" value="{{tabla}}"/>
+					<div>
+						<label for="titulo" class='is-required'>Titulo de la publicación</label>
+						<input placeholder="" id="titulo" name="titulo" class="form-control">
+					</div>
+					<hr/>
+					{%if tabla == 'cartelera_inmueble' %}
+						<div>
+							<label for="inmueble" class="is-required">Seleccione el condominio</label>
+							<select class="form-control" name="inmueble" id="inmueble">
+								<option value="">--Seleccione un Condominio--</option>
+								{% for inmueble in inmuebles %}
+									<option value="{{inmueble.id}}">{{inmueble.nombre_inmueble}}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<hr/>
+					{% endif %}
+					<div class="row">
+						<div class="col-md-3">
+							<div>
+								<label for="fecha" class='is-required'>Fecha de publicación</label>
+								<div class="input-group date">
+									<input 
+										id="fecha" 
+										name="fecha" 
+										class="form-control date-picker input-mask-date" 
+										autocomplete="off" 
+										data-date-format="dd-mm-yyyy" />
+									<span class="input-group-addon">
+										<i class="fa fa-calendar-o"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div>
+								<label for="fecha_hasta">Fin de publicación</label>
+								<div class="input-group date">
+									<input 
+										id="fecha_hasta" 
+										name="fecha_hasta" 
+										class="form-control date-picker" 
+										autocomplete="off" 
+										data-date-format="dd-mm-yyyy" />
+									<span class="input-group-addon">
+										<i class="fa fa-calendar-o"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr/>
+					<div>
+						<label for="contenido" class='is-required'>Publicación</label>
+
+						<textarea row="6" id="contenido" name="contenido"></textarea>
+						<div class="placeholder">
+							Hola,<br>
+							escriba aquí su publicación<br>
+                            y dale formato al texto
+						</div>
+					</div>
+					<hr/>
+					<div class="spacer small"></div>
+					<button type="submit" class="btn btn-primary btn-big">Enviar</button>
+				</form>
+				<div id="respuesta"></div>
+			</div>
+		</div>
+	{% endblock %}
+	{% block js %}
+	{{parent()}}
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+	<script src="{{constant('ROOT')}}js/bootstrap-datepicker.js"></script>
+	<script src="{{constant('ROOT')}}js/summernote.js"></script>
+	<script src="{{constant('ROOT')}}js/summernote-es-ES.js"></script>
+	<script src="{{constant('ROOT')}}/js/jquery-validate/jquery.validate.min.js"></script>
+
+	<script>
+	$("ul.nav-list li").eq(1).addClass("active");
+		$('.date-picker').datepicker({
+		autoclose: true,
+		todayHighlight: true
+	})
+
+	$('div.alert').hide();
+
+	$('.date-picker').datepicker({
+		autoclose: true,
+		todayHighlight: true
+	});
+	var $placeholder = $('.placeholder');
+	$('#contenido').summernote({
+		lang: 'es-ES',
+		height: 240,
+		codemirror: {
+		mode: 'text/html',
+		htmlMode: true,
+		lineNumbers: true,
+		theme: 'monokai'
+		},
+		callbacks: {
+			onInit: function() {
+				$placeholder.show();
+			},
+			onFocus: function() {
+				$placeholder.hide();
+			},
+			onBlur: function() {
+				var $self = $(this);
+				setTimeout(function() {
+				if ($self.summernote('isEmpty') && !$self.summernote('codeview.isActivated')) {
+					$placeholder.show();
+				}
+				}, 300);
+			}
+		},
+		toolbar: [
+			// [groupName, [list of button]]
+			['fontname', ['fontname']],
+			['style',['bold', 'italic', 'underline', 'clear']],
+			['font',['strikethrough', 'superscript', 'subscript']],
+			['fontsize', ['fontsize']],
+			['color', ['color']],
+			['para',['ul', 'ol', 'paragraph']],
+			['height', ['height']],
+			['insert',['link', 'hr']]
+		]
+	});
+	$('.btn-default').addClass('btn-primary').removeClass('btn-default');
+	$("#publicacion").validate({
+
+	submitHandler: function (form) {
+
+	$.ajax({
+		url: "{{ constant('URL_INTRANET') }}/cartelera/guardar",
+		type: "POST",
+		data: $("#publicacion").serialize(),
+		dataType: "json",
+		beforeSend: function () {
+
+			$("button").attr("disabled", "disabled");
+			$("#fallo, #exito").hide();
+
+		},
+		success: function (data) {
+			if (typeof data.error !== 'undefined' && data.error !== '') {
+				$("button").removeAttr("disabled");
+			}
+			if (data.suceed === true) {
+				console.log(data);
+				$("#fallo").hide();
+				$("#exito").html('<strong><i class="ace-icon fa fa-check"></i> Muy bien!</strong> ' + data.mensaje).fadeIn();
+				$("button").removeAttr("disabled");
+				$("#publicacion")[0].reset();
+				$('#contenido').summernote('code', '');
+
+			} else {
+
+				$("#exito").hide();
+				$("#fallo").html('<strong><i class="ace-icon fa fa-times"></i> Oops!</strong> ' + data.mensaje).fadeIn();
+				$("button").removeAttr("disabled");
+
+			}
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			$("#fallo").html('Ocurrió el siguiente error durante el proceso: <strong>Error ' + xhr.status + ' ' + thrownError + '</strong>. Por favor intente más tarde.').fadeIn();
+			$("button").removeAttr("disabled");
+		}
+	});
+	},
+	// debug: true,
+	errorPlacement: function (error, element) {
+
+		if (element.is("texarea")) {
+
+			error.insertAfter($('#editor'));
+
+		} else {
+
+			if (element.hasClass("date-picker")) {
+				error.insertAfter(element.parent());
+			} else {
+				error.insertAfter(element);
+			}
+
+		}
+
+	},
+	onkeyup: false,
+	onclick: false,
+	ignore: [],
+	rules: {
+	titulo: {
+		required: true
+	},
+	contenido: {
+		required: true,
+		minlength: 20
+	},
+	fecha: {
+		required: true
+	},
+	inmueble: {
+		required: true
+	}
+	},
+	messages: {
+		titulo: "Coloque un título a esta publicación",
+		contenido: {
+			required: "Ingrese contenido a esta publicación",
+			minlength: 'Se requieren mínimo 20 caracteres'
+		},
+		fecha: 'Falta fecha de publicación',
+		inmueble: 'Debe seleccionar un condominio de la lista'
+	},
+	errorClass: "error",
+	errorElement: "span",
+	highlight: function (element) {
+		$(element).prev().removeClass("has-success").addClass("has-error");
+		$(element).parent().removeClass("has-success").addClass("has-error");
+	},
+	success: function (element) {
+		$(element).parent().removeClass("has-error").addClass("has-success");
+		$(element).prev().removeClass("has-error").addClass("has-success");
+	}
+	});
+	</script>
+	{% endblock %}

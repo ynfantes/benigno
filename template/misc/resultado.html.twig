@@ -5,7 +5,7 @@
     <p><strong>{{ resultado.mensaje|capitalize|nl2br }}</strong></p>
     {% if constant('DEBUG')%}
     <pre>
-        {{ dump(resultado)}}
+        {{dump(resultado)}}
     </pre>
     {%endif %}
 </div>

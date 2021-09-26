@@ -97,7 +97,7 @@ Class db {
             $r['data'] = $exc->getTraceAsString();
             $r['row'] = isset($data[0]) ? $data[0] : array();
         }
-        $this->log("select", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("select", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
 
@@ -123,7 +123,7 @@ Class db {
             $r['stats']['error'] = $this->mysqli->error;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("exec", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("exec", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
 
@@ -194,8 +194,9 @@ Class db {
                 if ($cant_reg>0) {
                     $query.= ' LIMIT '.$cant_reg;
                 }
+                
                 $resultado = $this->mysqli->query($query);
-
+                
                 $a = array();
                 if ($this->mysqli->errno == 0) {
                     while ($fila = $resultado->fetch_array(MYSQLI_ASSOC)) {
@@ -220,7 +221,7 @@ Class db {
             $r['stats']['error'] = $this->mysqli->error;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("select", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("select", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
 
@@ -276,7 +277,7 @@ Class db {
             $r['stats']['error'] = $this->mysqli->error;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("insert", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("insert", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
     
@@ -350,7 +351,7 @@ Class db {
             $r['stats']['error'] = $this->mysqli->error;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("insert", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("insert", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
     
@@ -408,7 +409,7 @@ Class db {
             $r['suceed'] = false;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("update", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("update", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
 
@@ -459,7 +460,7 @@ Class db {
             $r['stats']['error'] = $this->mysqli->error;
             $r['data'] = $exc->getTraceAsString();
         }
-        $this->log("delete", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
+        //$this->log("delete", $r['suceed'], $r['query'], isset($r['stats']['error']) ? $r['stats']['error'] : "");
         return $r;
     }
 
