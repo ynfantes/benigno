@@ -50,8 +50,7 @@ switch ($accion) {
         echo $twig->render('enlinea/index.html.twig', array(
             'session'              => $session,
             'fecha_actualizacion'  => $fecha_actualizacion,
-            'cartelera_inmueble'   => $cartelera_inmueble,
-            'inm'                  => $inm
+            'cartelera_inmueble'   => $cartelera_inmueble
             ));
         break;
 }
