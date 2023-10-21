@@ -50,9 +50,6 @@ try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
         <a class="btn" href="{{ constant("URL_SISTEMA")}}/cliente">Volver al listado</a>
     </div>
 {% else %}
-    {% block sidebar %}
-        {{ parent() }}
-    {% endblock %}
     <div class="page-content">
         <div class="page-content-area">
 <div class="page-header">

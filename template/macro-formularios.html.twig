@@ -1,9 +1,9 @@
 {# plantilla para formularios #}
 
 {# INPUT #}
-{% macro  input(type, class, id, name, value, disabled) %}
-<input type="{{type|default('text')}}" class="{{class}}" value="{{ value }}" name="{{ name }}" id="{{ id|default(name) }}" {{ disabled ? 'disabled="true"':' ' }}/>
-{% endmacro%}
+{% macro  input(type = "text", class, id, name, value, disabled) %}
+<input type="{{type}}" class="{{class}}" value="{{ value }}" name="{{ name }}" id="{{ id|default(name) }}" {{ disabled ? 'disabled="true"':' ' }}/>
+{% endmacro %}
 
 {# SELECT#}
 {% macro select(class, id, name, disabled, values, selected) %}
@@ -12,10 +12,10 @@
         <option value="{{ elemento.id}}" {{ selected == elemento.id?"selected='selected'":""}}>{{ elemento.nombre }}</option>
     {% endfor %}
 </select>
-{% endmacro%}
+{% endmacro %}
 
 {# CONTROL - INPUT#}
-{% macro control_input(type, class, id, name, value, disabled)%}
+{% macro control_input(type, class, id, name, value, disabled) %}
 <div class="control-group">
     <label for="{{ name }}">{{ name|title }}</label>
     <div class="controls">
