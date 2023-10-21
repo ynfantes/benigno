@@ -10,6 +10,7 @@ $lista_inm  = $inmueble->listarInmueblesAutorizados($session['usuario']['id']);
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : '';
 
+$result = array();
 
 switch ($accion) {
 

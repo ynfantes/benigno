@@ -30,18 +30,25 @@ switch ($accion) {
             $inmueble       = new inmueble();
             $propietario    = new propietario();
             $propiedades    = new propiedades();
-            $inm            = $inmueble->ver($_POST['inmueble']);
-            
+            $honorarios     = 0;
+            $honorarios_usd = 0;
+            $deuda          = 0;
+
+            $inm       = $inmueble->ver($_POST['inmueble']);
+            $data_inm  = $inm['data'][0];
+
             $propiedad = $propiedades->verPropiedad($_POST['inmueble'], $_POST['apto']);
             
             $lista_pro = $propietario->listarPropietariosPorInmueble($_POST['inmueble']);
-            $prop = $propietario->obtenerPropietario($_POST['inmueble'], $_POST['apto']);
             
-            $factura = $facturas->estadoDeCuenta($_POST['inmueble'], $_POST['apto']);
+            $prop       = $propietario->obtenerPropietario($_POST['inmueble'], $_POST['apto']);
+
+            $factura    = $facturas->estadoDeCuenta($_POST['inmueble'], $_POST['apto']);
             
             if ($factura['suceed'] == true) {
 
                 for ($index = 0; $index < count($factura['data']); $index++) {
+
                     $filename = "../../enlinea/avisos/" . $factura['data'][$index]['numero_factura'] . ".pdf";
                     $factura['data'][$index]['aviso'] = file_exists($filename);
                     
@@ -66,15 +73,27 @@ switch ($accion) {
                         $factura['data'][$index]['pagado'] = 0;
                         $factura['data'][$index]['pagado_detalle']='';
                     }
+                    $deuda += ($factura['data'][$index]['facturado'] - $factura['data'][$index]['abonado']);
                 }
 
-                $cuenta = Array(
-                    'codinm'        => $_POST['inmueble'],
+                /* Calculamos honorarios, si aplica */
+                if ($data_inm['meses_mora'] > 0 && $data_inm['porc_mora'] > 0 && $propiedad['row']['meses_pendiente'] > $data_inm['meses_mora']) {
+                    
+                    $honorarios = $deuda * $data_inm['porc_mora'] / 100;
+                    if ($data_inm['tasa_cambio']) $honorarios_usd = round($honorarios / $data_inm['tasa_cambio'],2);
+                }
+
+                $cuenta = [
                     'apto'          => $_POST['apto'],
-                    'inmueble'      => $inm['data'][0],
-                    'propietario'   => $prop,
+                    'codinm'        => $_POST['inmueble'],
+                    'honorarios'    => $honorarios,
+                    'honorarios_usd'=> $honorarios_usd,
+                    'inmueble'      => $data_inm,
                     'propiedad'     => $propiedad['row'],
-                    'recibos'       => $factura['data']);
+                    'propietario'   => $prop,
+                    'recibos'       => $factura['data'],
+                ];
+
             }
         }
         $lista_inm = $inmueble->listar();

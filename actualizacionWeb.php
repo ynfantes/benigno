@@ -58,13 +58,13 @@ foreach ($lineas as $linea) {
             "numero_cuenta"     => '',
             "supervision"       => '0',
             "RIF"               => $registro[5],
-            "meses_mora"        =>$registro[6],
-            "porc_mora"         =>$registro[7],
+            "meses_mora"        => $registro[6],
+            "porc_mora"         => $registro[7],
             "moneda"            => $registro[8],
             "unidad"            => $registro[9],
             "facturacion_usd"   => $registro[10],
             'tasa_cambio'       => $registro[11],
-            'redondea_usd'     => $registro[12]    
+            'redondea_usd'      => $registro[12]    
                 );
         
         $r = $inmueble->insertar($registro);
@@ -475,7 +475,7 @@ $fecha = JFILE::read(ACTUALIZ."ACTUALIZACION.txt");
 echo "****FIN DEL PROCESO DE ACTUALIZACION****<br />";
 echo "Fecha: ".$fecha."<br/>";
 $mensaje.="Fecha: ".$fecha;
-$mail = new mailto(SMTP);
+$mail = new mailto();
 $mensaje = '<img alt="Tu Condominio Fácil" src="https://tucondominiofacil.com.ve/wp-content/uploads/2017/04/cropped-angelica2-2.png" id="logo" width="130" height="80"><br><br>'
         . '<div style="color:rgb(0,0,0);font-family:Helvetica;font-size:15px!important;font-weight:400;line-height:22px!important;color:#000000">'.$mensaje;
 $mensaje.= '</div><div style="display: block;width: 60px;height: 2px;margin:10px 0;background-color:#1e73be ;position: relative;float:left"></div>'

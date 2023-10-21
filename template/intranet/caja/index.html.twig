@@ -122,6 +122,7 @@ Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
         <table  class="table table-bordered table-striped responsive-utilities">
             <caption style="text-align: left;"><h5 class="header blue bolder smaller">{{cuentas.inmueble.nombre_inmueble}}<br> 
                     {{cuentas.inmueble.unidad}}: {{cuentas.propiedad.apto }}<br>
+                    Meses Pendientes: {{cuentas.propiedad.meses_pendiente}}<br>
                 Deuda Total:
                 {% if cuentas.propiedad.meses_pendiente > constant('MESES_COBRANZA') %}
                 ---
@@ -130,6 +131,7 @@ Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
                 {{format_number(cuentas.propiedad.deuda_total)}}
                 {%if cuentas.inmueble.facturacion_usd%} o ${{cuentas.propiedad.deuda_usd}}{%endif%}
                 {% endif %}
+                
             </h5>
             <p class="text-info">Marque las facturas a cancelar<p>
             </caption>
@@ -183,9 +185,9 @@ Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
                     {{ format_number(factura.facturado - factura.abonado) }}
                     </span>
                 </td>
-                {%if cuentas.inmueble.facturacion_usd %}
+                {% if cuentas.inmueble.facturacion_usd %}
                     <td><span class="pull-right">{{format_number(factura.facturado_usd)}}</span></td>
-                {%endif%}
+                {% endif %}
                 <td>
                     {% if factura.pagado == 0 %}
                         <span class="label label-sm label-success arrowed-in arrowed-in-right">Pendiente</span> 
@@ -203,7 +205,7 @@ Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
             </tr>
             {% set counter = counter + 1 %}
             {% endfor %}
-            {% set honorarios = cuentas.propiedad.deuda_total - deuda %}
+            {# {% set honorarios = cuentas.propiedad.deuda_total - deuda %} #}
             </tbody>
             <tfoot>
             <tr>
@@ -219,12 +221,12 @@ Consultar <i class="ace-icon fa fa-arrow-right bigger-110"></i>
                     <input type="hidden" name="hono_apto" value="{{apto}}" />
                     <input type="hidden" name="hono_periodo" value="{{periodo|date_modify("+1 month")|date("Y-m-d 00:00:00")}}" />
                     <input type="hidden" name="hono_fact" value="HONORARIOS" />
-                    <input type="hidden" name="hono_monto" value="{{honorarios}}" />
+                    <input type="hidden" name="hono_monto" value="{{cuentas.honorarios}}" />
                     <span class="pull-right blue bolder smaller">Honorarios:</span>
                 </td>
-                <td><span class="pull-right"><input type="text" name="honorarios" value="{{format_number(honorarios)}}" style="text-align: right;" /></span></td>
+                <td><span class="pull-right"><input type="text" name="honorarios" value="{{format_number(cuentas.honorarios)}}" style="text-align: right;" /></span></td>
                 {%if cuentas.inmueble.facturacion_usd%}
-                <td><span class="pull-right">{{format_number(cuentas.propiedad.deuda_usd - deuda_usd)}}</span></td>
+                <td><span class="pull-right">{{format_number(cuentas.honorarios_usd)}}</span></td>
                 {%endif%}
             </tr>
             <tr>

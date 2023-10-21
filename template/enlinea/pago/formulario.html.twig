@@ -438,6 +438,11 @@ $(":checkbox").click(function() {
             $(this).prop('checked',false);
         }
     }
+    if ($(this).val() < ($(":checkbox").length - 1) && !$(this).prop('checked')) {
+            $(":checkbox").each(function() {
+                $(this).prop('checked',false);
+            });
+        }
     var monto = 0;
     $("input:checked").each(function() {
         var  monto_factura = $("input[name|='montos[]']").eq($(this).val()).val();
