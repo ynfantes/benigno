@@ -5,11 +5,13 @@ include_once "../includes/usuario.php";
 usuario::esUsuarioLogueado();
 
 $session = $_SESSION;
-$inmueble = new inmueble();
+
+$inmueble  = new inmueble();
 $lista_inm = $inmueble->listarInmueblesAutorizados($session['usuario']['id']);
 
-echo $twig->render('intranet/index.html.twig', array(
-    'session'   => $session,
-    'inmuebles' => $lista_inm['data'],
-    'mensajes'  => 0
-));
+$options = [
+    'session'  => $session,
+    'inmuebles'=> $lista_inm['data'],
+    'mensajes' => 0
+];
+echo $twig->render('intranet/index.html.twig', $options);

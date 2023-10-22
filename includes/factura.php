@@ -74,6 +74,15 @@ class factura extends db implements crud {
             return false;
         }
     }
-}
 
-?>
+    public function avisoExisteEnBaseDeDatos($aviso) {
+        
+        $aviso = str_replace(".pdf","",$aviso);
+        $query = "select numero_factura from facturas where numero_factura='".$aviso."'";
+        
+        $result = $this->dame_query($query);
+
+        return $result['suceed'] && !empty($result['data']);
+        
+    }
+}

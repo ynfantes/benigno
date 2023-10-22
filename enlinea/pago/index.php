@@ -12,7 +12,6 @@ $bitacora = new bitacora();
 
 switch ($accion) {
     
-    // <editor-fold defaultstate="collapsed" desc="cancelacion">
     case "cancelacion":
         $titulo = $_GET['id'] . ".pdf";
         $content = 'Content-type: application/pdf';
@@ -21,9 +20,7 @@ switch ($accion) {
         header($content);
         readfile($url);
         break;
-    // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="ver">
     case "ver":
         $propiedad = new propiedades();
         $inmuebles = new inmueble();
@@ -68,11 +65,10 @@ switch ($accion) {
 
         break; // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="guardar">
     case "guardar":
         $pago = new pago();
         $data = $_POST;
-        if (count($data) > 0) {
+        if (!empty($data)) {
             unset($data['registrar']);
             $data['fecha']=date("Y-m-d H:i:00 ", time());
             $exito = $pago->registrarPago($data);
@@ -87,9 +83,7 @@ switch ($accion) {
         //    "accion" => "registrar"
         //));
         break;
-    // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="registrar">
         case "registrar":
         case "listar":
         default :
@@ -130,7 +124,7 @@ switch ($accion) {
                                 $factura['data'][$index]['id_inmueble'], 
                                 $factura['data'][$index]['apto']
                             );
-                            if ($r['suceed'] && count($r['data'])>0) {
+                            if ($r['suceed'] && !empty($r['data'])) {
                         
                                 $factura['data'][$index]['pagado'] = 1;
                                 $factura['data'][$index]['pagado_detalle'] = "<i class='fa fa-calendar-o'></i> ".
@@ -166,13 +160,11 @@ switch ($accion) {
         "propiedades"=> $propiedades['data']
         ));
         break; 
-// </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="listaPagoDetalle">
     case "listaPagosDetalle":
         $pagos = new pago();
         $pago_detalle = $pagos->detalleTodosPagosPendientes();
-        if ($pago_detalle['suceed'] && count($pago_detalle['data']) > 0) {
+        if ($pago_detalle['suceed'] && !empty($pago_detalle['data'])) {
             echo "id_pago,id_inmueble,id_apto,monto,id_factura<br>";
             foreach ($pago_detalle['data'] as $value) {
                 echo $value['id_pago'] . ",";
@@ -184,14 +176,12 @@ switch ($accion) {
             }
         }
         break;  
-// </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="listaPagosMaestros">
     case "listaPagosMaestros":
         $pagos = new pago();
         $pagos_maestro = $pagos->listarPagosPendientes();
 
-        if ($pagos_maestro['suceed'] && count($pagos_maestro['data']) > 0) {
+        if ($pagos_maestro['suceed'] && !empty($pagos_maestro['data'])) {
             echo "id,fecha,tipo_pago,numero_documento,fecha_documento,monto,banco_origen,";
             echo "banco_destino,numero_cuenta,estatus,email,enviado,telefono<br>";
             foreach ($pagos_maestro['data'] as $pago) {
@@ -212,20 +202,18 @@ switch ($accion) {
             }
         }
         break; 
-// </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="listaPagosPendientes">
     case "listarPagosPendientes":
         $pagos = new pago();
         $pagos_maestro = $pagos->listarPagosPendientes();
 
-        if ($pagos_maestro['suceed'] && count($pagos_maestro['data']) > 0) {
+        if ($pagos_maestro['suceed'] && !empty($pagos_maestro['data'])) {
 
             foreach ($pagos_maestro['data'] as $pago) {
 
                 $pago_detalle = $pagos->detallePagoPendiente($pago['id']);
 
-                if ($pago_detalle['suceed'] && count($pago_detalle['data'] > 0)) {
+                if ($pago_detalle['suceed'] && !empty($pago_detalle['data'])) {
                     $enviado = $pago["enviado"] == 0 ? "False" : "True";
                     echo "|" . $pago['id'] . "|";
                     echo Misc::date_format($pago['fecha']) . "|";
@@ -262,7 +250,6 @@ switch ($accion) {
 
         break; // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="confirmación de pago">
     case "confirmar":
 
 
@@ -275,7 +262,6 @@ switch ($accion) {
         echo $r;
         break; // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="actualizar factura">
     case "actualizar_factura":
 
         if (isset($_GET['inmueble']) && isset($_GET['apto']) && isset($_GET['id']) && isset($_GET['monto'])) {
@@ -291,5 +277,51 @@ switch ($accion) {
         
         }
         break; 
-    // </editor-fold>
+    
+    case "listarRecibosCancelados":
+        $propiedad = new propiedades();
+        $inmuebles = new inmueble();
+        $pagos = new pago();
+
+        $propiedades = $propiedad->propiedadesPropietario($_SESSION['usuario']['cedula']);
+        $cuenta = Array();
+
+        if ($propiedades['suceed'] == true) {
+
+            foreach ($propiedades['data'] as $propiedad) {
+
+                $inmueble = $inmuebles->ver($propiedad['id_inmueble']);
+                $pago = $pagos->listarCancelacionDeGastos($propiedad['id_inmueble'], $propiedad['apto'],5);
+                
+                if ($pago['suceed'] == true) {
+                    $bitacora->insertar(Array(
+                        "id_sesion"   => $session['id_sesion'],
+                        "id_accion"   => 12,
+                        "descripcion" => count($pago['data'])." recibos(s) registrado(s).",
+                    ));
+                    for ($index = 0; $index < count($pago['data']); $index++) {
+                        if (RECIBO_GENERAL==1) {
+                            $filename = "../../cancelacion.gastos/" . $pago['data'][$index]['n_recibo'] . ".pdf";
+                            $pago['data'][$index]['recibo'] = file_exists($filename);
+                        } else {
+                            $filename = "../../cancelacion.gastos/" . $pago['data'][$index]['numero_factura'] . ".pdf";
+                            $pago['data'][$index]['recibo'] = file_exists($filename);
+                        }
+                    }
+                    
+                    $cuenta[] = [
+                        'inmueble'    => $inmueble['data'][0],
+                        'propiedades' => $propiedad,
+                        'cuentas'     => $pago['data']
+                    ];
+                }
+            }
+        }
+        
+        echo $twig->render('enlinea/pago/cancelacion.gastos.html.twig', array("session" => $session,
+            "cuentas" => $cuenta));
+
+
+        break;
+
 }

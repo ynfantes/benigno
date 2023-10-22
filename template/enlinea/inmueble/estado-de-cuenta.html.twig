@@ -5,122 +5,181 @@
 {# JAVASCRIPT #}
 {% block head %}
 {{ parent() }}
-<script src="{{ constant("ROOT")}}js/printThis.js"></script>
-<script type="text/javascript" >
-    $(document).ready(function() {
-        $(".btn-primary").click(function() {
-            $(".span3").css("display",'none');
-            $(".span9").css("width",'100%');
-            $("#printable").printThis({
-                pageTitle : 'Estado de Cuenta ' + $(this).attr("title").toString()
+<script src="{{constant("ROOT")}}js/printThis.js"></script>
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+
+        $("button[type='submit']").click(function () {
+            
+            $("div.page-content").printThis({
+                pageTitle: 'Estado de Cuenta ' + $(this).attr("title").toString(),
+                printContainer: true,
+                beforePrint: $(".widget-toolbar").css('display','none'),
+                afterPrint: $(".widget-toolbar").css('display','block')
             });
-            $(".span3").css("display",'');
-            $(".span9").css("width",'870px');
+            
             return(false);
         });
+
     });
+
 </script>
 {% endblock %}
 
 {# CONTENIDO #}
 {% block contenido %}
-<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
-<script type="text/javascript">
-try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
-</script>
-<ul class="breadcrumb">
-<li>
-<i class="ace-icon fa fa-home home-icon"></i>
-<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
-</li>
-<li class="active">Estado de Cuenta Inmueble</li>
-</ul><!-- /.breadcrumb -->
-<div id="nav-search" class="nav-search">
-<form class="form-search">
-<span class="input-icon">
-<input type="text" autocomplete="off" id="nav-search-input" class="nav-search-input" placeholder="Buscar ...">
-<i class="ace-icon fa fa-search nav-search-icon"></i>
-</span>
-</form>
-</div><!-- /.nav-search -->
-</div>
-{% if resultado is defined %}
-    {% include 'misc/resultado.html.twig' %}
-    <div>
-        <a class="btn" href="{{ constant("URL_SISTEMA")}}/cliente">Volver al listado</a>
-    </div>
-{% else %}
-    <div class="page-content">
-        <div class="page-content-area">
-<div class="page-header">
-<h1>
-Estado de Cuenta<small>
-<i class="ace-icon fa fa-angle-double-right"></i>
-Inmueble
-</small>
-</h1>
-</div>
-</div>
-        <div class="col-lg-8 col-md-12 col-sm-12">
-        <div class="accordion" id="accordion2">
-    {% for cuenta in cuentas %}
-            <div class="accordion-group">
-                <h3 class="header smaller lighter red">
-                <i class="ace-icon fa fa-th-large"></i>
-                {{ cuenta.inmueble.nombre_inmueble }}
-                </h3> 
-                <div id="collapseOne" class="accordion-body collapse in">
-                    <div class="accordion-inner">
-                        <table  class="table table-bordered table-striped responsive-utilities">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: center">Apartamento</th>
-                                    <!--th style="text-align: center">Propietario</th-->
-                                    <th style="text-align: center">Nº Recibos</th>
-                                    <th style="text-align: center">Deuda</th>
-                                    {%if cuenta.inmueble.facturacion_usd %}
-                                    <th style="text-align: center">Deuda USD</th>
-                                    {%endif%}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if cuenta.cuenta is empty %}
-                                    <tr><td colspan="4"><div class="alert alert-error">
-                                            <strong>Atención!</strong> No se puede cargar esta información.</div></td></tr>
-                                {% else %}
-                                    {% set total_deuda = 0 %}
-                                    {% set total_usd = 0 %}
-                                    {% for detalle in cuenta.cuenta %}
-                                        {% set total_deuda = total_deuda + detalle.deuda %}
-                                        {% set total_usd = total_usd + detalle.deuda_usd %}
-                                        <tr>
-                                            <td><div class="text-center">{{detalle.apto}}</div></td>
-                                            <!--td>{#{ detalle.propietario }#}</td-->
-                                            <td><div class="text-center">{{ detalle.recibos }}</div></td>
-                                            <td><span class="pull-right">{{format_number(detalle.deuda)}}</span></td>
-                                            {%if cuenta.inmueble.facturacion_usd %}
-                                            <td><span class="pull-right">{{format_number(detalle.deuda_usd)}}</span></td>
-                                            {%endif%}
-                                        </tr>
-                                    {% endfor %}
-                                        <tr><td colspan="2">Total</td><!--td><strong>Total:</strong></td-->
-                                            <td><span class="pull-right"><strong>{{ format_number(total_deuda) }}</strong></span></td>
-                                            {%if cuenta.inmueble.facturacion_usd %}
-                                            <td><span class="pull-right"><strong>{{format_number(total_usd)}}</strong></span></td>
-                                            {%endif%}
-                                        </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                            <div class="form-actions">
-                                <button class="btn btn-primary" type="submit" title="{{cuenta.inmueble.nombre_inmueble}}">Imprimir</button>
+	<div id="breadcrumbs" class="breadcrumbs breadcrumbs-fixed">
+		<script type="text/javascript">
+			try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {}
+		</script>
+		<ul class="breadcrumb">
+			<li>
+				<i class="ace-icon fa fa-home home-icon"></i>
+				<a href="{{constant('URL_SISTEMA')}}">{{ constant("NOMBRE_APLICACION")}}</a>
+			</li>
+			<li class="active">Estado de Cuenta Inmueble</li>
+		</ul>
+		<!-- /.breadcrumb -->
+		<div id="nav-search" class="nav-search">
+			<form class="form-search">
+				<span class="input-icon">
+					<input type="text" autocomplete="off" id="nav-search-input" class="nav-search-input" placeholder="Buscar ...">
+					<i class="ace-icon fa fa-search nav-search-icon"></i>
+				</span>
+			</form>
+		</div>
+		<!-- /.nav-search -->
+	</div>
+	{% if resultado is defined %}
+		{% include 'misc/resultado.html.twig' %}
+		<div>
+			<a class="btn" href="{{ constant("URL_SISTEMA")}}/cliente">Volver al listado</a>
+		</div>
+	{% else %}
+		<div class="page-content">
+			<div class="page-content-area">
+				<div class="page-header">
+					<h1>
+						Estado de Cuenta<small>
+							<i class="ace-icon fa fa-angle-double-right"></i>
+							Inmueble
+						</small>
+					</h1>
+				</div>
+			</div>
+            <div class="row">
+                <div class="col-lg-8 col-md-12 col-sm-12">
+                    <div class="widget-box">
+                        {% for cuenta in cuentas %}
+                            <div class="widget-header widget-header-flat">
+                                <h4 class="widget-title lighter red"><strong>
+                                <i class="ace-icon fa fa-building"></i>
+                                {{cuenta.inmueble.nombre_inmueble}}</strong>
+                                </h4>
+
+                                <div class="widget-toolbar">
+                                    <a data-action="collapse" href="#">
+                                    <i class="ace-icon fa fa-chevron-up"></i>
+                                    </a>
+                                </div>
+                                <div class="widget-toolbar no-border">
+                                    <button 
+                                        class="btn btn-xs bigger btn-yellow dropdown-toggle" 
+                                        title="Estado de cuenta {{cuenta.inmueble.nombre_inmueble}}"
+                                        type="submit">
+                                        <i class="ace-icon fa fa-print icon-on-right"></i>
+                                        Imprimir
+                                    </button>
+
+                                    
+                                </div>
                             </div>
+                            
+                            <div class="widget-body" style="overflow: hidden; display: block;">
+                                
+                                    <table class="table table-bordered table-striped responsive-utilities">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: center">{{cuenta.inmueble.unidad|title}}</th>
+                                                <!--th style="text-align: center">Propietario</th-->
+                                                <th style="text-align: center">Nº Recibos</th>
+                                                <th style="text-align: center">Deuda {{cuenta.inmueble.moneda}}</th>
+                                                {%if cuenta.inmueble.facturacion_usd %}
+                                                    <th style="text-align: center">Deuda USD</th>
+                                                {% endif %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if cuenta.cuenta is empty %}
+                                                <tr>
+                                                    <td colspan="4">
+                                                        <div class="alert alert-error">
+                                                            <strong>Atención!</strong>
+                                                            No se puede cargar esta información.</div>
+                                                    </td>
+                                                </tr>
+                                            {% else %}
+                                                {% set total_deuda = 0 %}
+                                                {% set total_usd = 0 %}
+                                                {% for detalle in cuenta.cuenta %}
+                                                    {% set total_deuda = total_deuda + detalle.deuda %}
+                                                    {% set total_usd = total_usd + detalle.deuda_usd %}
+                                                    <tr>
+                                                        <td>
+                                                            <div class="text-center">{{detalle.apto}}</div>
+                                                        </td>
+                                                        <!--td>{#{ detalle.propietario }#}</td-->
+                                                        <td>
+                                                            <div class="text-center">{{ detalle.recibos }}</div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="pull-right">{{format_number(detalle.deuda)}}</span>
+                                                        </td>
+                                                        {% if cuenta.inmueble.facturacion_usd %}
+                                                            <td>
+                                                                <span class="pull-right">{{format_number(detalle.deuda_usd)}}</span>
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endfor %}
+                                                    <tr>
+                                                        <td colspan="2">Total</td>
+                                                        <!--td><strong>Total:</strong></td-->
+                                                        <td>
+                                                            <span class="pull-right">
+                                                                <strong>{{ format_number(total_deuda) }}</strong>
+                                                            </span>
+                                                        </td>
+                                                        {%if cuenta.inmueble.facturacion_usd %}
+                                                            <td>
+                                                                <span class="pull-right">
+                                                                    <strong>{{format_number(total_usd)}}</strong>
+                                                                </span>
+                                                            </td>
+                                                            {%endif%}
+                                                        </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                    <div class="widget-toolbox padding-8 clearfix">
+                                        <button 
+                                            class="btn btn-lg btn-success pull-right" 
+                                            type="submit" 
+                                            title="Estado de cuenta {{cuenta.inmueble.nombre_inmueble}}">
+                                            <i class="ace-icon fa fa-print"></i> Imprimir
+                                            </button>
+                                        </button>
+                                    </div>
+                                
+                            </div>
+                            
+                        {% endfor %}
                     </div>
                 </div>
-            </div>    
-    {% endfor %}
-        </div>
-    </div>
-    </div>
-{% endif %}
+            </div>
+		</div>
+	{% endif %}
 {% endblock %}

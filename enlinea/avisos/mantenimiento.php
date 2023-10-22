@@ -10,25 +10,19 @@ $n = 0;
 while ($elemento = readdir($dir)){
     // Tratamos los elementos . y .. que tienen todas las carpetas
     if( $elemento != "." && $elemento != ".." && $elemento != "mantenimiento.php" && $elemento != "index.php"){
+        
         // Si es una carpeta
         if(!is_dir($path.$elemento) ){
-            $r = $factura->avisoExisteEnBaseDeDatos($elemento);
-            if ($r==0) {
+            
+            if (!$factura->avisoExisteEnBaseDeDatos($elemento)) {
                 unlink($path."/".$elemento);
+                //echo $path."/".$elemento."<br>";
                 $n++;
             } else {
                 $e++;
             }
-//            // Muestro el fichero
-//            while (ob_get_level()) {
-//                ob_end_flush();
-//            }
-//            // start output buffering
-//            if (ob_get_length() === false) {
-//                ob_start();
-//            }
-//            echo "<br />".$path."/".$elemento." --> ".$r;
-            //if ($n == 100)                break;
+            
+            //if ($n == 20)                break;
         }
     }
 }

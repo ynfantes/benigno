@@ -1,4 +1,5 @@
 {% extends 'layout/fluid.html.twig' %}
+{% import 'macro-formularios.html.twig' as form %}
 {# JAVASCRIPT #}
 {% block head %}
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -82,17 +83,17 @@ de condominio
         <div class="col-xs-12 col-sm-9">
         <div class="clearfix">
         <table  class="table table-bordered table-striped responsive-utilities">
-            <caption style="text-align: left;"><h5>{{ cuenta.inmueble.nombre_inmueble }}<br> 
-                Apartamento/Casa: {{ cuenta.propiedades.apto }} <br>
-                Deuda Total: Bs.
+            <ul class="list-unstyled">
+                <li><strong><i class="fa fa-building"></i> {{ cuenta.inmueble.nombre_inmueble }}</strong></li>
+                <li><strong><i class="fa fa-user"></i> {{cuenta.inmueble.unidad|title}}: {{ cuenta.propiedades.apto }}</strong></li>
+                <li><strong><i class="fa fa-money"></i> Deuda Total:
                 {% if cuenta.propiedades.meses_pendiente > constant('MESES_COBRANZA') %}
                         ---
                 {% else %}
-                    {{ format_number(cuenta.propiedades.deuda_total) }}
-                {% endif %}
-            </h5>
+                    <span class="label label-info">{{ format_number(cuenta.propiedades.deuda_total) }}</span>
+                {% endif %}</strong></li>
+            </ul>
             <p class="text-info">Marque las facturas a cancelar<p>
-            </caption>
             <thead>
                 <tr>
                     <th style="text-align: center">Pagar</th>

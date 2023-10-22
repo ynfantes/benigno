@@ -435,4 +435,38 @@ Continuar:
         
         return $this->exec_query($sql);
     }
+
+    public function listarCancelacionDeGastos($inmueble, $apartamento,$registros = 0) {
+        $criterio = [
+            'id_inmueble' => $inmueble,
+            'id_apto'     => $apartamento
+        ];
+        $order = [ "STR_TO_DATE(CONCAT('01-', periodo), '%Y-%m-%d')" => "DESC"];
+        
+        return $this->select( 
+            "*", 
+            "cancelacion_gastos",
+            $criterio,
+            null,
+            $order,
+            null,
+            $registros
+        );
+    }
+
+    public function insertarCancelacionDeGastos($data) {
+        return db::insert("cancelacion_gastos",$data);
+    }
+
+    public function cancelacionExisteEnBaseDeDatos($cancelacion) {
+        
+        $cancelacion = str_replace(".pdf","",$cancelacion);
+        $query = "select numero_factura from cancelacion_gastos where numero_factura='".$cancelacion."'";
+        
+        
+        $result = $this->dame_query($query);
+        
+        return $result['suceed'] && !empty($result['data']);
+        
+    }
 }

@@ -12,10 +12,12 @@ while ($elemento = readdir($dir)){
     if( $elemento != "." && $elemento != ".." && $elemento != "mantenimiento.php" && $elemento != "index.php"){
         // Si es una carpeta
         if(!is_dir($path.$elemento) ){
-            $r = $pago->cancelacionExisteEnBaseDeDatos($elemento);
-            if ($r==0) {
+            
+            if ( !$pago->cancelacionExisteEnBaseDeDatos($elemento)) {
+
                 unlink($path."/".$elemento);
                 $n++;
+                
             } else {
                 $e++;
             }

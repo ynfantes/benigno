@@ -42,7 +42,7 @@ Propietario
 <!--caption style="text-align: left;"><h4>{#{ cuenta.inmueble.nombre_inmueble }#}</h4></caption-->
 <thead>
 <tr>
-<th style="text-align: center">Apartamento</th>
+<th style="text-align: center">{{cuenta.inmueble.unidad|title}}</th>
 <th style="text-align: center" class="hidden">Deuda<small>Inmueble</small></th>
 <th style="text-align: center" class="hidden">Fondo<small>de Reserva</small></th>
 <th style="text-align: center">Deuda Total</th>
@@ -108,7 +108,7 @@ no tiene recibos pendiente de pago.
 </tr>
 {% endfor %}
 </tbody>
-{%if cuenta.inmueble.facturacion_usd==1 %}
+{% if cuenta.inmueble.facturacion_usd == 1 %}
 <tfoot>
 <tr>
 <th colspan="4"><span class="pull-right">Total Deuda</span></th>
@@ -116,7 +116,7 @@ no tiene recibos pendiente de pago.
 <th><span class="pull-right">{{format_number(cuenta.propiedades.deuda_usd)}}</span></th>
 </tr>
 <tfoot>
-{%endif%}
+{% endif %}
 </table>
 {% endif %}
 {% endif %}

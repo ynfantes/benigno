@@ -66,8 +66,11 @@ class usuario extends db implements crud  {
 
     public static function esUsuarioLogueado() {
         session_start();
-        if (!isset($_SESSION['status']) || $_SESSION['status'] != 'logueado' || !isset($_SESSION['usuario']))
+        if (!isset($_SESSION['status']) || $_SESSION['status'] != 'logueado' || !isset($_SESSION['usuario'])) {
+
             header("location:".ROOT."intranet.php");
+            die();
+        }
     }
     
     public static  function logout() {
